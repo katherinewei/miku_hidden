@@ -1,0 +1,119 @@
+body {
+  background-color: #f4f4f4; }
+
+.login-box {
+  width: 360px;
+  margin: 7% auto; }
+  .login-box .login-logo {
+    font-size: 29px;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: 300; }
+  .login-box .login-box-body {
+    background: #fff;
+    padding: 20px;
+    border-top: 0;
+    color: #666;
+    border-radius: 5px;
+    -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
+  .login-box .login-box-msg {
+    margin: 0;
+    text-align: center;
+    padding: 0 20px 30px 20px;
+    font-size: 16px;
+    font-weight: bold; }
+  .login-box .form-group {
+    margin-bottom: 15px;
+    position: relative; }
+    .login-box .form-group.last {
+      margin-bottom: 26px; }
+    .login-box .form-group p {
+      color: #f00;
+      line-height: 26px;
+      position: absolute;
+      left: 10px; }
+    .login-box .form-group input {
+      display: block;
+      width: 100%;
+      height: 40px;
+      padding: 6px 12px 6px 42px;
+      font-size: 14px;
+      line-height: 1.42857143;
+      color: #555;
+      background-color: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 4px;
+      -webkit-transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+      transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; }
+  .login-box .icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    display: block;
+    width: 40px;
+    height: 40px;
+    line-height: 34px;
+    text-align: center;
+    pointer-events: none;
+    background-size: 100% auto; }
+    .login-box .icon.user-icon {
+      background-image: url("http://ninelab.b0.upaiyun.com/common/images/personalTailor/csad/loading_username.png"); }
+    .login-box .icon.pswd-icon {
+      background-image: url("http://ninelab.b0.upaiyun.com/common/images/personalTailor/csad/loading_pw.png"); }
+  .login-box .icheck label:before {
+    width: 16px;
+    height: 16px;
+    background-image: url("http://ninelab.b0.upaiyun.com/common/images/personalTailor/csad/loading_unselect.png");
+    background-size: 100%;
+    content: "";
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle; }
+  .login-box .icheck label.active:before {
+    background-image: url("http://ninelab.b0.upaiyun.com/common/images/personalTailor/csad/loading_selected.png"); }
+  .login-box #mysubmit {
+    width: 100%;
+    background-color: #292929;
+    color: #fff;
+    border-radius: 5px;
+    line-height: 40px;
+    border-width: 0;
+    margin: 15px 0;
+    font-size: 16px; }
+
+.rightTxt {
+  text-align: right; }
+  .rightTxt.reg {
+    text-decoration: underline;
+    color: #000; }
+
+.forgetpsd {
+  color: #7c7c7c;
+  float: right; }
+
+.register-box .form-group input {
+  padding-left: 12px; }
+
+.register-box .colorY {
+  color: #cea550;
+  display: inline-block; }
+
+.register-box .rightInput {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100px;
+  height: 36px;
+  margin: 2px;
+  text-align: center;
+  background-color: #cea550;
+  color: #fff;
+  line-height: 36px;
+  border-radius: 3px; }
+  
+  /*µ¯´°*/
+  .tbtx-broadcast{
+      top: 30%;
+  }

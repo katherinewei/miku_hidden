@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiden.persistence.DeviceInfoDOMapper" >
+
+
+ <resultMap id="WxDeviceMap" type="com.hiden.web.model.WxInfoVo" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="wxid" property="wxid" jdbcType="BIGINT" />
+    <result column="date_created" property="dateCreated" jdbcType="TIMESTAMP" />
+    <result column="last_updated" property="lastUpdated" jdbcType="TIMESTAMP" />
+    <result column="online_time" property="onlineTime" jdbcType="TIMESTAMP" />
+    <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+    <result column="wx_lemon_name" property="wxLemonName" jdbcType="VARCHAR" />
+    <result column="wx_opend_id" property="wxOpendId" jdbcType="VARCHAR" />
+    <result column="device_info" property="deviceInfo" jdbcType="VARCHAR" />
+    <result column="wx_num" property="wxNum" jdbcType="VARCHAR" />
+    <result column="wx_pic" property="wxPic" jdbcType="VARCHAR" />
+    <result column="contact_flag" property="contactFlag" jdbcType="TINYINT" />
+    <result column="auto_talk" property="autoTalk" jdbcType="TINYINT" />
+  </resultMap>
+  
+  <resultMap id="WxNumVoMap" type="com.hiden.web.model.WxNumVo" >
+     <result column="user_id" property="userId" jdbcType="BIGINT" />
+     <result column="wxid" property="wxId" jdbcType="BIGINT" />
+     <result column="wx_num" property="wxNum" jdbcType="VARCHAR" />
+  </resultMap>
+  
+
+
+   <!-- 根据用户id来查找对应的设备Id内容-->
+   <select id="selectDeviceByUserId" resultMap="WxDeviceMap" parameterType="java.util.Map">
+        SELECT device.auto_talk,device.id,device.user_id,device.device_info,device.wxid,device.online_time,device.device_name, device.contact_flag,
+		wcontact.wx_lemon_name,wcontact.wx_opend_id,wcontact.wx_num,wcontact.wx_pic,wcontact.date_created,wcontact.last_updated
+		FROM (SELECT * FROM device_info WHERE user_id=#{userId}
+		order by last_updated desc
+		LIMIT #{limit} 
+		OFFSET #{offset}) AS device 
+		LEFT JOIN wx_contact_info AS wcontact
+		ON  device.wxid = wcontact.id
+   </select>
+   
+   
+   <!-- 根据用户id来确定对应的人数-->
+   <select id="selectTotalCount" resultType="java.lang.Integer"  parameterType="java.lang.Long">
+     select count(*) from device_info where user_id=#{id}
+   </select>
+   
+   
+   <!-- 
+    SELECT GROUP_CONCAT(id)  FROM device_info WHERE user_id=79269
+   -->
+   <!-- 根据用户的id来查找deviceIds的结合内容-->
+   <select id="selectDeviceIdsByUserId" resultType="java.lang.String"  parameterType="java.lang.Long">
+     SELECT GROUP_CONCAT(id)  FROM device_info WHERE user_id=#{id}
+   </select>
+   
+   
+   <select id="selectWxNumByUserId"  parameterType="java.lang.Long"  resultMap="WxNumVoMap">
+   		SELECT device.wxid,device.user_id,wx.wx_num FROM 
+		(SELECT * FROM device_info WHERE user_id=#{id} and auto_talk=1) AS device
+		INNER JOIN 
+		wx_contact_info AS wx ON device.wxid=wx.id
+   </select>
+</mapper>

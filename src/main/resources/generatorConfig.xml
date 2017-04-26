@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+
+    <!-- <classPathEntry
+            location="/Users/daniel/.m2/repository/mysql/mysql-connector-java/5.1.32/mysql-connector-java-5.1.32.jar"/> -->
+
+
+    <context id="all" targetRuntime="MyBatis3">
+
+        <property name="suppressTypeWarnings" value="true"/>
+		
+		
+		<!-- 进行分页：limit  offset的操作 -->
+       <!--  <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"/>
+        <plugin type="com.hiden.mybatis.plugins.PaginationPlugin"/> -->
+
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://rdsqv472b2f2i81q2b11o.mysql.rds.aliyuncs.com:3306/hiden?useUnicode=true&amp;characterEncoding=utf-8"
+                        userId="unes"
+                        password="8xW7wdWdhFe">
+        </jdbcConnection>
+
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="true"/>
+        </javaTypeResolver>
+
+        <javaModelGenerator targetPackage="com.hiden.persistence.domain"
+                            targetProject="${project.hiden.commons.dir}/target">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <sqlMapGenerator targetPackage="com.hiden.persistence.mybatis"
+                         targetProject="${project.hiden.commons.dir}/target">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.hiden.persistence"
+                             targetProject="${project.hiden.commons.dir}/target">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+        
+		
+		<table tableName="wx_friend_list" domainObjectName="WxFriendList">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+		
+		
+        <!-- 
+        
+        <table tableName="profile" domainObjectName="ProfileDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="wx_device_task_job" domainObjectName="WxDeviceTaskJobDo">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+         <table tableName="profile_statement" domainObjectName="ProfileStatementDo">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+		
+        <table tableName="task_and_device" domainObjectName="TaskAndDeviceDo">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+         <table tableName="device_info" domainObjectName="DeviceInfoDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+         <table tableName="wx_contact_info" domainObjectName="WxContactInfoDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+		
+        <table tableName="profile" domainObjectName="ProfileDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+
+        <table tableName="profile_coop" domainObjectName="ProfileCoopDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+
+        <table tableName="coop_profile" domainObjectName="CoopProfileDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+
+        <table tableName="profile_wechat" domainObjectName="ProfileWechatDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+
+        <table tableName="wechat_profile" domainObjectName="WechatProfileDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+
+        <table tableName="message_summary" domainObjectName="MessageSummaryDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table> -->
+
+
+    </context>
+</generatorConfiguration>

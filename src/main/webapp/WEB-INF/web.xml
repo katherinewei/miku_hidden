@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+	<display-name>Hiden Application</display-name>
+
+	<!-- 执行顺序:context-param => Listener => Filter => Servlet -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+            classpath:applicationContext.xml
+        </param-value>
+	</context-param>
+
+
+	<context-param>
+		<param-name>spring.profiles.active</param-name>
+		<param-value>test</param-value>
+	</context-param>
+
+	<!-- 加载 Spring 容器的listener 配置 -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
+
+	<!-- spring session aop -->
+	<filter>
+		<filter-name>sessionValidate</filter-name>
+		<filter-class>com.hiden.common.SessionValidateFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>sessionValidate</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- 编码设置 aop -->
+	<filter>
+		<filter-name>Set Character Encoding</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>utf-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>Set Character Encoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- DelegatingFilterProxy是filter的代理，设置后可以通过Spring容器来管理filter的生命周期，在filter中可以直接通过spring注入，另外配置文件都可以通过配置来实现 -->
+	<!-- Shiro是一个java安全框架 -->
+	<filter>
+		<filter-name>shiroFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<init-param>
+			<param-name>targetFilterLifecycle</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>shiroFilter</filter-name>
+		<url-pattern>*.htm</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>shiroFilter</filter-name>
+		<url-pattern>*.json</url-pattern>
+	</filter-mapping>
+
+
+
+	<servlet>
+		<servlet-name>spring</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>detectAllHandlerExceptionResolvers</param-name>
+			<!-- 取消其自动注册的异常解析器 -->
+			<param-value>false</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+
+
+	<servlet>
+		<servlet-name>wsServlet</servlet-name>
+		<servlet-class>com.hiden.web.socket.android.MeWebSocketServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>wsServlet</servlet-name>
+		<url-pattern>/wsServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>spring</servlet-name>
+		<!-- 这里在配成spring,下边也要写一个名为spring-servlet.xml的文件，主要用来配置它的controller -->
+		<url-pattern>*.htm</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>spring</servlet-name>
+		<!-- 这里在配成spring,下边也要写一个名为spring-servlet.xml的文件，主要用来配置它的controller -->
+		<url-pattern>*.json</url-pattern>
+	</servlet-mapping>
+</web-app>

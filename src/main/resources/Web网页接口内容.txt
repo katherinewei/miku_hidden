@@ -1,0 +1,604 @@
+App端接口内容：
+001
+1.
+url:
+http://localhost:8080/hiden/api/m/1.0/addDeviceInfoContent.json
+说明:成功登陆并授权传参
+参数：
+
+	type=1:获取微信用户列表信息 2:发朋友圈 3:淘宝任务 4.其他..
+
+    /**
+     * 进行用户进行初始化的时候终端
+     * @param deviceInfo 终端的唯一标示
+     * @param wxNum 微信号
+     * @param deviceName 设备名称
+     * @param openId 微信的唯一标示
+     * @param lemonName 微信名称
+     * @param wxPic 微信的头像
+     */
+		    @RequestParam(value="deviceInfo", required=false) String deviceInfo,
+    		@RequestParam(value="deviceName", required=false) String deviceName,
+    		@RequestParam(value="lemonName", required=false) String lemonName,
+    		@RequestParam(value="wxPic", required=false) String wxPic,
+    		@RequestParam(value="openId", required=false) String openId,
+    		@RequestParam(value="wxNum", required=false) String wxNum
+
+返回:
+
+
+
+deviceInfo:data [设备基本信息]
+wxInfo:data [微信账号基本信息]
+job:list[任务列表]
+status:1自动回复  0不自动回复
+statement：当status=1就有回复的规则
+contactFlag:[0不添加对应的通讯录 1添加对应的通讯录]
+
+
+
+2.
+url:
+http://localhost:8080/hiden/api/m/1.0/getJobListData.json
+说明:轮训任务接口
+参数：
+
+     * @param deviceInfo 终端的唯一标示
+     @RequestParam(value="deviceInfo", required=false) String deviceInfo
+    
+
+
+
+返回:
+job:list[任务列表][未执行的任务]
+job.type  获取微信用户列表信息 2:发朋友圈 3:淘宝任务 4.其他..
+
+
+list.startTime  为开始时间
+
+
+
+
+3.
+url:
+http://localhost:8080/hiden/api/m/1.0/getJobListDataRecord.json
+说明:任务记录内容值记录
+参数：
+
+		    @RequestParam(value="pageNo", required=false,defaultValue="0") int pageNo,    第几页
+    		@RequestParam(value="pageSize", required=false,defaultValue="10") int pageSize, 页码
+    		@RequestParam(value="deviceInfo", required=false) String deviceInfo           终端唯一标示
+    
+
+
+
+返回:
+recordList:list[任务记录内容值记录倒叙的内容值]
+list.deviceStatus ---->执行状态:-1失败 0=未开始 1成功 2异常 -2删掉
+
+
+
+
+
+
+4.
+url:
+http://localhost:8080/hiden/api/m/1.0/doOneTaskStatus.json
+说明:修改任务的状态值
+参数：
+
+     @RequestParam(value="taskId", required=false,defaultValue="-1") Long taskId,  任务的id值【获取job的列表的id值】
+     @RequestParam(value="status", required=false,defaultValue="-1") byte status   修改对应的状态内容值【执行状态:-1失败 0=未开始 1成功 2异常 -2删掉】
+    
+http://localhost:8080/hiden/pages/index.jsp
+
+
+返回:
+task:data[任务对象]
+
+
+
+
+
+
+5.url：
+http://localhost:8080/hiden/api/h/1.0/MemgetJobListData.json
+说明: Memcache进行轮训job的list
+    		@RequestParam(value="deviceInfo", required=false) String deviceInfo
+		@RequestParam(value="tflag", required=false,defaultValue="-1") int tflag,
+
+		tflag==1时,不经过缓存进行查询,而是实时的查询   其他情况都是经过缓存查询的
+返回:
+job:list[任务列表][未执行的任务]
+job.type  获取微信用户列表信息 2:发朋友圈 3:淘宝任务 4.其他..
+
+list.startTime  为开始时间
+list.nowTime  当前系统的时间
+list.phoneList  电话簿内容列表
+list.defaultName  发送的默认信息内容
+list.nowTime  当前系统的时间
+contactFlag:[0不添加对应的通讯录 1添加对应的通讯录]
+list.talkFlag  自动对话的标示
+list.wxListstr  微信号的集合(以;进行隔开)
+
+6.url：
+http://localhost:8080/hiden/api/m/1.0/ChangeMemcacheStatus.json
+说明: 改变Memcache进行轮训job的list
+	ids是电话簿id的内容集合;隔开
+    		@RequestParam(value="deviceInfo", required=false) String deviceInfo
+    		@RequestParam(value="ids", required=false) String ids
+    		@RequestParam(value="wxListFlag", required=false,defaultValue="-1") int wxListFlag[微信号集合已经获取,设置为wxListFlag=1,下次请求缓存则不再返回微信给你了]
+返回:
+无返回的内容值
+
+
+
+
+7.url：
+http://localhost:8080/hiden/api/m/1.0/changePhoneListStatus.json
+说明: 
+			//ids
+			//-->id#type#isenable;id#type#isenable;id#type#isenable
+			//内容说明:id为数据的电话簿的id  isenable :是否有效[1有效 -1处理过但无效]  type:电话号码的类型:1搜索类型 2添加通讯录
+			@RequestParam(value="wxId", required=false,defaultValue="-1") Long wxId,
+			@RequestParam(value="deviceInfo", required=false) String deviceInfo,
+    		@RequestParam(value="ids", required=false) String ids
+返回:
+ map.put("msg", "更改对应的通讯电话本信息内容");
+
+8.url：
+http://localhost:8080/hiden/api/m/1.0/changePhonetoSuccess.json
+说明: 
+			//-->id#wxName;id#wxName;id#wxName
+			//内容说明:id为数据的电话簿的id  wxName:添加成功的微信名称内容
+			@RequestParam(value="ids", required=false) String ids,
+	    	@RequestParam(value="wxName", required=false) String wxName
+返回:
+   map.put("msg", "更改对应的通讯电话本信息内容");
+   
+   
+   
+
+http://192.168.1.239:8080/hiden/wsServlet
+
+
+
+http://192.168.1.239:8080/hiden/test/getMemcacheContent.json?userId=79269
+
+
+
+http://192.168.1.239:8080/hiden/test/socket.json?sessionId=7BE260906607032C1A576B771847B4C1
+
+
+PC端接口内容：
+
+首页进行登录的界面：
+
+
+真正环境的链接:http://120.24.102.187:8070/hiden/pc/h/1.0/login.htm
+
+登录:
+http://192.168.1.239:8080/hiden/pc/h/1.0/login.htm
+注册：
+http://192.168.1.239:8080/hiden/pc/h/1.0/register.htm
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/selectPcTaskRecordInfoByUserId.json?userId=79269
+
+登录成功后进行接口的调用:  以profileId=79269为参考
+
+
+
+
+http://120.24.102.187:8070/hiden/pc/h/1.0/login.htm
+
+1.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/getdeviceListByUserId.json
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/getdeviceListByUserId.json?profileId=79269
+说明:根据对应的用户的id来进行获取整个微信列表信息内容
+参数：
+	AutoStatus:自动回复的标示
+    @RequestParam(value="pageNo", required=false,defaultValue="0") int pageNo,
+    @RequestParam(value="profileId", required=false,defaultValue="-1") Long profileId,
+    @RequestParam(value="pageSize", required=false,defaultValue="10") int pageSize
+    
+
+
+返回:
+result:data[微信列表信息内容]
+resule.data.contactFlag[代表设备是否有对电话本的添加内容]
+
+
+2.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/addOneTaskContent.json
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/addOneTaskContent.json
+说明://添加对应的task内容：增加任务操作[朋友圈  淘宝任务  获取朋友列表信息 自动回复内容的添加]
+参数：
+    flag:1.获取微信用户列表信息 2:发朋友圈 3:淘宝任务 4.其他..
+    deviceIds：硬件的设备的id集合，以;隔开
+    comment为评论的内容
+   			@RequestParam(value="profileId", required=false,defaultValue="-1") Long profileId,
+    		@RequestParam(value="flag", required=false,defaultValue="-1") int flag,
+    		@RequestParam(value="deviceIds", required=false) String deviceIds,
+    		@RequestParam(value="taskValue", required=false) String taskValue,
+    		@RequestParam(value="startTime", required=false) String startTime,
+    		@RequestParam(value="taskPic", required=false) String taskPic
+    		@RequestParam(value="comment", required=false) String comment,
+
+返回:
+result:task[任务]
+result.conndata
+
+
+
+
+
+
+3.接口失效：请使用接口insertManyProfileStatemts.json
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/insertProfileStatemt.json
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/insertProfileStatemt.json
+说明://单单给自动回复的规则进行添加对应的数据
+参数：                         关键字:keyword   自动回复内容:content
+
+		    @RequestParam(value="content", required=false) String content,
+    		@RequestParam(value="profileId", required=false,defaultValue="-1") Long profileId,
+    		@RequestParam(value="deviceId", required=false,defaultValue="-1") Long deviceId
+    		@RequestParam(value="keyword", required=false) String keyword,
+返回:
+result
+
+
+
+
+
+
+4.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/insertManyProfileStatemts.json
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/insertManyProfileStatemts.json
+说明:添加多个自动回复的内容值
+参数：
+		             关键字:keyword   自动回复内容:content
+		    @RequestParam(value="content", required=false) String content,
+    		@RequestParam(value="keyword", required=false) String keyword,
+    		@RequestParam(value="profileId", required=false,defaultValue="-1") Long profileId,
+    		@RequestParam(value="deviceIds", required=false) String deviceIds
+返回:
+result.statementSize
+
+
+
+5.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/changePersonAuto.json
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/changePersonAuto.json
+说明:用户取消个人自动回复的功能
+参数：
+
+		@RequestParam(value="profileId", required=false,defaultValue="-1") Long profileId,
+    		@RequestParam(value="autoStatus", required=false,defaultValue="1") Byte autoStatus
+返回:
+result.flag
+
+
+
+
+
+6.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/changeDeviceRelyAuto.json
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/changeDeviceRelyAuto.json
+说明:用户取消个人对应终端的自动回复的功能【终端的集合】
+参数：
+			autoStatus=0为取消  1恢复自动回复   
+			deviceIds终端的id的集合,以;隔开
+			@RequestParam(value="deviceIds", required=false) String deviceIds,
+    		@RequestParam(value="autoStatus", required=false,defaultValue="1") Byte autoStatus
+返回:
+result.size
+
+
+
+
+
+8.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/selectProfileStatemtBydeviceId.json
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/selectProfileStatemtBydeviceId.json
+说明:根据对应的deviceId来查询的statement内容值
+参数：
+		@RequestParam(value="deviceId", required=false,defaultValue="-1") Long deviceId,
+    		@RequestParam(value="userId", required=false,defaultValue="-1") Long userId,
+    		@RequestParam(value="pageNo", required=false,defaultValue="0") int pageNo,
+    		@RequestParam(value="pageSize", required=false,defaultValue="10") int pageSize
+返回:
+result.statement
+
+
+
+
+
+
+/pc/h/1.0/selectPcTaskRecordInfoByUserId.json
+
+
+9.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/selectAutoContents.json
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/selectAutoContents.json?deviceIds=2,79411
+说明:根据用户id来查找全部自动回复的内容值
+参数：
+			deviceIds：硬件的设备的id集合，以;隔开
+		@RequestParam(value="deviceIds", required=false) String deviceIds,
+    		@RequestParam(value="userId", required=false,defaultValue="-1") Long userId,
+    		@RequestParam(value="pageNo", required=false,defaultValue="0") int pageNo,
+    		@RequestParam(value="pageSize", required=false,defaultValue="10") int pageSize
+
+返回:
+result.statement
+result.hasNext 是否分页【true为有下一页  false没有下一页】
+statement.ids[由多个值id值的集合组成]
+
+
+
+10.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/selectPcTaskRecordInfoByUserId.json?userId=79269
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/selectPcTaskRecordInfoByUserId.json
+说明:
+    //根据用户id来查找对应的用户任务列表信息内容
+    //执行状态:-1失败 0=未开始 1成功 2异常 -2删掉
+参数：
+			当status=null也就是不传参数就是获取的是全部内容列表值
+		@RequestParam(value="status", required=false) Byte status,
+    		@RequestParam(value="userId", required=false,defaultValue="-1") Long userId,
+    		@RequestParam(value="pageNo", required=false,defaultValue="0") int pageNo,
+    		@RequestParam(value="pageSize", required=false,defaultValue="10") int pageSize
+返回:
+result.list
+list.deviceStatus 为依据:-1失败 0=未开始 1成功 2异常 -2删掉
+result.totalsize  总数内容
+
+
+
+
+
+
+
+
+12.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/changeManyTaskStatus.json
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/changeManyTaskStatus.json
+说明:
+     //一批task从一个任务状态转变成另外一种状态
+    //执行状态:-1失败 0=未开始 1成功 2异常 -2删掉
+参数：
+		taskIds是以 taskIds#taskIds#taskIds... 而taskIds是以;进行隔开
+		@RequestParam(value="taskIds", required=false) String taskIds,
+    		@RequestParam(value="status", required=false,defaultValue="-2") Byte status
+返回:
+result.size
+
+
+
+
+
+13.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/updateManyProfileStatemts.json
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/updateManyProfileStatemts.json
+说明:
+			sIds是statement的ids集合内容【这个值由selectAutoContents.json进行查出的对象的ids内容值集合字符串，不进行处理直接进行提交即可】
+			flag=1为更新  flag=0为删除
+			@RequestParam(value="flag", required=false,defaultValue="-1") int flag,
+    		@RequestParam(value="content", required=false) String content,
+    		@RequestParam(value="keyword", required=false) String keyword,
+    		@RequestParam(value="profileId", required=false,defaultValue="-1") Long profileId,
+    		@RequestParam(value="sIds", required=false) String sIds
+参数：
+			@RequestParam(value="taskIds", required=false) String taskIds,
+    		@RequestParam(value="status", required=false,defaultValue="-2") Byte status
+返回:
+result.statement
+
+
+
+14.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/upYunUploadPics.json
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/upYunUploadPics.json
+说明:
+			原来的怎么操作现在就怎么操作就可以了
+		    @RequestParam(value = "isSetWidth", required=false, defaultValue="false") Boolean isSetWidth,
+			@RequestParam(value = "width", required=false, defaultValue="700") Integer width,
+			@RequestParam(value = "type", required=false, defaultValue="1") Integer type,
+			@RequestParam(value = "file", required=true) MultipartFile[] files // 关键就是这句话起了作用	
+返回:
+图片url
+
+
+
+
+
+15.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/selectWxListByUserId.json?userId=79269
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/selectWxListByUserId.json
+说明:根据用户id查找对应的关联微信信息用户列表内容
+			@RequestParam(value="userId", required=false,defaultValue="-1") Long userId,
+    		@RequestParam(value="pageNo", required=false,defaultValue="0") int pageNo,
+    		@RequestParam(value="pageSize", required=false,defaultValue="10") int pageSize	
+返回:
+result.list  关联微信的信息列表内容  
+result.totalSize  关联微信的信息总数
+
+
+16.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/selectFriendListByWxId.json?wxId=79412&userId=79269&pageNo=0&pageSize=2
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/selectFriendListByWxId.json
+说明:根据用户id查找对应的关联微信信息用户列表内容
+			@RequestParam(value="userId", required=false,defaultValue="-1") Long userId,
+    		@RequestParam(value="wxId", required=false,defaultValue="-1") Long wxId,
+    		@RequestParam(value="pageNo", required=false,defaultValue="0") int pageNo,
+    		@RequestParam(value="pageSize", required=false,defaultValue="10") int pageSize
+返回:
+result.list  关联微信的信息列表内容  
+result.totalSize  关联微信的信息总数
+
+
+17.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/deleteOneDivcByWxId.json
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/deleteOneDivcByWxId.json
+说明:删除对应的微信关联内容信息
+			@RequestParam(value="userId", required=false,defaultValue="-1") Long userId,
+    		@RequestParam(value="wxId", required=false,defaultValue="-1") Long wxId
+返回:
+result.size  删除的数量内容
+
+
+http://192.168.1.239:8080/hiden/pc/h/1.0/selectPcTaskRecordInfoByUserId.json
+
+
+
+
+18.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/editOneTaskContent.json
+说明:对未开始的朋友圈进行编辑内容值
+			comment为评论的内容
+	
+    		@RequestParam(value="taskId", required=false,defaultValue="-1") Long taskId,
+    		@RequestParam(value="taskValue", required=false) String taskValue,
+    		@RequestParam(value="startTime", required=false) String startTime,
+    		@RequestParam(value="taskPic", required=false) String taskPic
+    		@RequestParam(value="comment", required=false) String comment,
+返回:
+result.data  编辑的内容
+
+
+
+
+
+19.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/wxuploadExcel.json
+说明:上传对应的excel内容
+    		@RequestParam(value="userId", required=false,defaultValue="1") Long userId,
+			@RequestParam(value = "file", required=true) MultipartFile file // 关键就是这句话起了作用
+返回:
+result.size  能够插入多少条通讯录手机的数据
+
+
+20.
+url:
+http://192.168.1.239:8080/hiden/pc/h/1.0/getPhoneListData.json
+说明:获取对应的手机号码的数据
+    		@RequestParam(value="userId", required=false,defaultValue="-1") Long userId,
+			@RequestParam(value="pageNo", required=false,defaultValue="0") int pageNo,
+    		@RequestParam(value="pageSize", required=false,defaultValue="10") int pageSize
+返回:
+result.data  获取的是手机列表信息内容
+
+
+
+21.改变对应的默认值内容
+	http://192.168.1.239:8080/hiden/pc/h/1.0/changeDefualtName.json
+	@RequestMapping(value = {"/pc/h/1.0/changeDefualtName.json"}, produces = "application/json;charset=utf-8")
+    @RequestParam(value="defaultName", required=false) String defaultName
+返回:
+result.defaultName 对应的默认值内容
+
+
+21.改变电话簿的标示与互聊的标示【0不可添加对应通讯录内容    1可添加对应通讯录内容】
+	url:/hiden/pc/h/1.0/changeDevicePhoneFlag.json
+说明:修改是否修改对应的电话簿或者是互聊的标示
+参数:
+	deviceIds	string	设备的id集合以;隔开
+	status		int	是否对电话簿的操作(0为不是 1为是)
+	talkStatus	int     是否对话(0为不是 1为是)
+返回:
+	status  int  电话簿的状态(等于-1时忽略)
+	talkStatus  int 互聊的状态(等于-1时忽略)
+	size  int  修改数据的条数
+
+
+
+
+22.来查找对应的任务列表内容信息
+	http://192.168.1.239:8080/hiden/pc/h/1.0/selectfinalJobList.json
+	@RequestParam(value="status", required=false) Byte status,
+    @RequestParam(value="userId", required=false,defaultValue="-1") Long userId,
+    @RequestParam(value="pageNo", required=false,defaultValue="0") int pageNo,
+    @RequestParam(value="pageSize", required=false,defaultValue="10") int pageSize
+    
+返回:    
+result.list
+list.job  任务内容
+list.list 对应执行的内容
+list.list.deviceStatus 为依据:-1失败 0=未开始 1成功 2异常 -2删掉
+result.totalsize  总数内容
+
+
+
+
+23.改变电话簿的电话内容状态
+status=是否已经读取过[0没有读取 1读取 -1为删除的内容]---->仅能是读取过的，但是isEnabled=0 和  isSuccess=0
+phoneIds以;进行隔开
+	http://192.168.1.239:8080/hiden/pc/h/1.0/changePhoneListStatus.json
+	@RequestParam(value="phoneIds", required=false) String phoneIds,
+	@RequestParam(value="status", required=false,defaultValue="-2"
+    
+返回:   
+result.size 数量值 
+
+
+
+24.进行查看对应详情内容
+status=是否已经读取过[0没有读取 1读取 -1为删除的内容]---->仅能是读取过的，但是isEnabled=0 和  isSuccess=0
+	http://192.168.1.239:8080/hiden/pc/h/1.0/getPhoneDetailContent.json
+	@RequestParam(value="phoneId", required=false,defaultValue="-1") Long phoneId
+    
+返回:   
+失败：result.msg
+成功:result.data
+
+
+25.判断对应用户当前是否有效
+/pc/h/1.0/enableUserId.json
+返回:   
+msg
+失败：result.flag  0
+成功：result.flag  1
+
+
+
+26.删除图片的链接内容【说明：原先的对应上传图片操作的方法，xxx.json的前缀为:项目访问路径/pc/h/1.0/xxx.json  原先的处理上传方法在多群后台也同样适合使用，只是前缀不一样而已】
+/pc/h/1.0/upyunDeleteFile.json
+说明:
+			原来的怎么操作现在就怎么操作就可以了
+			filePath:路径
+			@RequestParam(value = "filePath", required=true) String filePath
+返回:   
+msg
+失败：result.status  0
+成功：result.status  1

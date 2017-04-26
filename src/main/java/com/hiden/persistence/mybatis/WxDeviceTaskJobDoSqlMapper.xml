@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hiden.persistence.WxDeviceTaskJobDoMapper" >
+
+  <resultMap id="RecordResultMap" type="com.hiden.web.model.TaskRecordVo" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="date_created" property="dateCreated" jdbcType="TIMESTAMP" />
+    <result column="last_updated" property="lastUpdated" jdbcType="TIMESTAMP" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="task_name" property="taskName" jdbcType="VARCHAR" />
+    <result column="version" property="version" jdbcType="BIGINT" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="device_status" property="deviceStatus" jdbcType="TINYINT" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="task_value" property="taskValue" jdbcType="VARCHAR" />
+    <result column="task_pic" property="taskPic" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+  </resultMap>
+
+
+
+
+  <resultMap id="PcTaskRecordMap" type="com.hiden.web.model.PcTaskRecordVo" >
+	    <id column="job_id" property="jobId" jdbcType="BIGINT" />
+	    <id column="device_id" property="deviceId" jdbcType="BIGINT" />
+	    <result column="task_value" property="taskValue" jdbcType="VARCHAR" />
+	    <result column="d_names" property="dNames" jdbcType="VARCHAR" />
+	    <result column="task_pic" property="taskPic" jdbcType="VARCHAR" />
+	    <result column="job_type" property="jobType" jdbcType="TINYINT" />
+	    <result column="job_status" property="jobStatus" jdbcType="TINYINT" />
+	    <result column="task_name" property="taskName" jdbcType="VARCHAR" />
+	    <result column="device_status" property="deviceStatus" jdbcType="TINYINT" />
+	    <result column="remark" property="remark" jdbcType="VARCHAR" />
+	    <result column="user_id" property="userId" jdbcType="BIGINT" />
+	    <result column="date_created" property="dateCreated" jdbcType="TIMESTAMP" />
+	    <result column="last_updated" property="lastUpdated" jdbcType="TIMESTAMP" />
+	    <result column="task_id" property="taskId" jdbcType="BIGINT" />
+	    <result column="device_info" property="deviceInfo" jdbcType="VARCHAR" />
+	    <result column="wx_id" property="wxId" jdbcType="BIGINT" />
+	    <result column="device_online_time" property="deviceOnlineTime" jdbcType="TIMESTAMP" />
+	    <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+	    <result column="wx_lemon_name" property="wxLemonName" jdbcType="VARCHAR" />
+	    <result column="wx_num" property="wxNum" jdbcType="VARCHAR" />
+	    <result column="wx_opend_id" property="wxOpendId" jdbcType="VARCHAR" />
+	    <result column="wx_pic" property="wxPic" jdbcType="VARCHAR" />
+	    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+	    <result column="comment" property="comment" jdbcType="VARCHAR" />
+	    <result column="address" property="address" jdbcType="VARCHAR" />
+	  </resultMap>
+
+   <!-- 根据设备信息来查找对应的任务内容:为开始的任务内容-->
+   <select id="selectTaskByDeviceInfo" resultMap="BaseResultMap" parameterType="java.util.Map">
+      select * from wx_device_task_job where  id in
+      (
+      	select job_id from task_and_device where status=0 and id = ( select id from device_info where device_info=#{info} and user_id=#{userId})
+      ) 
+   </select>
+   
+   
+   
+    <select id="selectTaskInfoByDeviceInf" resultMap="RecordResultMap" parameterType="java.util.Map">
+        select job.task_pic,job.task_value,job.type,job.status,job.task_name,
+     		device.status as device_status,device.remark as remark,device.user_id as user_id,job.start_time,job.comment,job.address,
+     		device.last_updated as last_updated,device.date_created as date_created,device.id as id   from wx_device_task_job as job
+	     INNER join 
+	     (
+	     	select * from task_and_device where  status=0 and device_id=
+	     	( select id from device_info where device_info=#{info} and user_id=#{userId})
+	     ) as device on device.job_id=job.id
+   </select>
+   
+   
+   <!-- 根据用户id来查找对应的用户任务列表信息内容-->
+   <!-- 
+  		执行状态:-1失败 0=未开始 1成功 2异常 -2删掉
+   		Sql:
+   			 SELECT 	job.id AS job_id,info.id AS device_id,
+			job.task_pic,job.task_value,job.type AS job_type,job.status AS job_status,job.task_name,
+     		device.status AS device_status,device.remark AS remark,device.user_id AS user_id,
+     		device.last_updated AS last_updated,device.date_created AS date_created,device.id AS task_id, 
+     		info.device_info,info.wxid AS wx_id,info.online_time AS device_online_time,info.device_name,
+     		contact.wx_lemon_name,contact.wx_num,contact.wx_opend_id,contact.wx_pic
+		     FROM wx_device_task_job AS job 
+		     INNER JOIN 
+		     (
+		     	SELECT * FROM task_and_device WHERE 
+		     	STATUS=0 AND
+		     	device_id=
+		     	( SELECT id FROM device_info WHERE user_id=79269)
+		     	 ORDER BY last_updated DESC  
+		     	 LIMIT  10
+		     	 OFFSET 0
+		     ) AS device  ON device.job_id=job.id
+		     LEFT JOIN device_info AS info
+		     ON device.device_id=info.id
+		     LEFT JOIN wx_contact_info AS contact ON info.wxid=contact.id
+    -->
+    <select id="selectPcTaskRecordInfoByUserIdInf" resultMap="PcTaskRecordMap" parameterType="java.util.Map">
+        	SELECT 	job.id AS job_id,info.id AS device_id,
+			job.task_pic,job.task_value,job.type AS job_type,job.status AS job_status,job.task_name,
+     		device.status AS device_status,device.remark AS remark,device.user_id AS user_id,
+     		device.last_updated AS last_updated,device.date_created AS date_created,device.id AS task_id, 
+     		info.device_info,info.wxid AS wx_id,info.online_time AS device_online_time,info.device_name,job.start_time,job.comment,job.address,
+     		contact.wx_lemon_name,contact.wx_num,contact.wx_opend_id,contact.wx_pic
+		     FROM wx_device_task_job AS job 
+		     INNER JOIN 
+		     (
+		     	SELECT * FROM task_and_device WHERE
+		     	STATUS!=-2 AND
+		     	<if test="status != null">
+		     		STATUS=#{status} AND
+		     	</if> 
+		     	device_id=
+		     	any( SELECT id FROM device_info WHERE user_id=#{userId})
+		     	 ORDER BY last_updated DESC  
+		     	 LIMIT  #{limit}
+		     	 OFFSET #{offset}
+		     ) AS device  ON device.job_id=job.id
+		     LEFT JOIN device_info AS info
+		     ON device.device_id=info.id
+		     LEFT JOIN wx_contact_info AS contact ON info.wxid=contact.id
+   </select>
+   
+   <!-- 根据用户id来查找对应的用户任务列表信息内容[较为准确版本内容]-->
+   <select id="selectPcTaskRecordInfoByUserIdInfPlusPlus" resultMap="PcTaskRecordMap"  parameterType="java.util.Map">
+		      SELECT job.id AS job_id,info.id AS device_id,
+				job.task_pic,job.task_value,job.type AS job_type,job.status AS job_status,job.task_name,
+				device.status AS device_status,device.remark AS remark,device.user_id AS user_id,
+				device.last_updated AS last_updated,device.date_created AS date_created,device.id AS task_id, job.address,
+				info.device_info,info.wxid AS wx_id,info.online_time AS device_online_time,info.device_name,job.start_time,job.comment,
+				contact.wx_lemon_name,contact.wx_num,contact.wx_opend_id,contact.wx_pic  FROM
+			      (
+			      SELECT ctask.* FROM task_and_device AS ctask INNER  JOIN
+			      (SELECT * FROM
+			      (SELECT * FROM task_and_device WHERE   STATUS!=-2 AND 
+			      <if test="status != null">
+		     		STATUS=#{status} AND
+		     	  </if> 
+			      user_id=#{userId}   GROUP BY STATUS,job_id) AS A  ORDER BY last_updated DESC
+			      LIMIT #{limit}
+			      OFFSET #{offset}) AS gtask
+			      ON ctask.job_id=gtask.job_id
+			      ORDER BY gtask.last_updated DESC
+			      ) AS device
+			      INNER JOIN 
+			      wx_device_task_job AS job
+			      ON device.job_id=job.id
+			      INNER JOIN device_info AS info
+			      ON device.device_id=info.id
+			  LEFT JOIN wx_contact_info AS contact ON info.wxid=contact.id
+			    <!-- SELECT job.id AS job_id,info.id AS device_id,
+				job.task_pic,job.task_value,job.type AS job_type,job.status AS job_status,job.task_name,
+				device.status AS device_status,device.remark AS remark,device.user_id AS user_id,
+				device.last_updated AS last_updated,device.date_created AS date_created,device.id AS task_id, job.address,
+				info.device_info,info.wxid AS wx_id,info.online_time AS device_online_time,info.device_name,job.start_time,job.comment,
+				contact.wx_lemon_name,contact.wx_num,contact.wx_opend_id,contact.wx_pic  FROM
+			      (
+			      (SELECT * FROM
+			      (SELECT * FROM task_and_device WHERE   STATUS!=-2 AND 
+			      <if test="status != null">
+		     		STATUS=#{status} AND
+		     	  </if> 
+			      user_id=#{userId}   GROUP BY STATUS,job_id) AS A  ORDER BY last_updated DESC
+			      LIMIT #{limit}
+			      OFFSET #{offset})
+			      ) AS device
+			      INNER JOIN 
+			      wx_device_task_job AS job
+			      ON device.job_id=job.id
+			      INNER JOIN device_info AS info
+			      ON device.device_id=info.id
+			  LEFT JOIN wx_contact_info AS contact ON info.wxid=contact.id -->
+   </select>
+   
+   
+   
+   
+   
+   
+   <!-- 根据不一样的状态来查找对应的总数内容-->
+   <select id="selectTotalSizeByStatus" resultType="java.lang.Integer"  parameterType="java.util.Map">
+             <!--  SELECT count(*) FROM task_and_device WHERE
+		     	STATUS!=-2 AND
+		     	<if test="status != null">
+		     		STATUS=#{status} AND
+		     	</if> 
+		     	device_id in
+		     	( SELECT id FROM device_info WHERE user_id=#{userId}
+		     	 ORDER BY last_updated DESC  
+		        )  -->
+		      SELECT COUNT(*) FROM
+		      (SELECT * FROM task_and_device WHERE   STATUS!=-2  AND
+		      <if test="status != null">
+		     		STATUS=#{status} AND
+		     	</if> 
+		       user_id=#{userId}  GROUP BY STATUS,job_id) AS A
+   </select>
+   
+   
+   
+   
+   
+   <!-- 根据设备信息来查找对应的任务内容:为开始的任务内容-->
+   <select id="selectTaskListRecordByDeviceInfo" resultMap="RecordResultMap" parameterType="java.util.Map">
+     select job.task_pic,job.task_value,job.type,job.status,job.task_name,
+     		device.status as device_status,device.remark as remark,device.user_id as user_id,job.start_time,job.comment,job.address,
+     		device.last_updated as last_updated,device.date_created as date_created,device.id as id   from wx_device_task_job as job 
+     INNER join 
+     (
+     	select * from task_and_device where device_id=
+     	( select id from device_info where device_info=#{info} and user_id=#{userId})
+     	 order by last_updated desc  
+     	 limit  #{limit}
+     	 offset #{offset}
+     ) as device on device.job_id=job.id
+   </select>
+   
+   
+   
+   <update id="setUtf8mb4Charat" >
+   		set names utf8mb4
+   </update>
+   
+   
+   
+    <!-- 进行任务的排列信息内容来查找对应的全部任务内容值-->
+    <select id="selectPcFinalJobList" resultMap="BaseResultMap"  parameterType="java.util.Map">
+			    <!--  SELECT id FROM wx_device_task_job WHERE user_id=79269 AND STATUS=1 ORDER BY last_updated DESC
+			  LIMIT  10  OFFSET 0 -->
+		SELECT * FROM wx_device_task_job WHERE user_id=#{userId} AND STATUS=1 
+		<if test="successNum != null">
+		  AND success_num>0
+		</if> 
+		<if test="errorNum != null">
+		  AND error_num>0
+		</if>
+		<if test="nodoNum != null">
+		  AND nodo_num>0
+		</if>
+		<if test="failNum!= null">
+		  AND fail_num>0
+		</if> 
+		<if test="allNum!= null">
+		  AND (success_num>0   or nodo_num>0 or fail_num>0)
+		</if>  
+		ORDER BY last_updated DESC
+		LIMIT  #{limit}  OFFSET #{offset}	  
+   </select>
+   
+   
+    <!--根据job的id的集合内容来查找对应的详情内容值-->
+    <select id="selectPcFinalJobDetailList" resultMap="PcTaskRecordMap"  parameterType="java.util.Map">
+			    <!--   SELECT 
+				device.job_id AS job_id,info.id AS device_id,
+				device.status AS device_status,device.remark AS remark,device.user_id AS user_id,
+				device.last_updated AS last_updated,device.date_created AS date_created,device.id AS task_id,
+				info.device_info,info.wxid AS wx_id,info.online_time AS device_online_time,
+				contact.wx_lemon_name,contact.wx_pic
+			  FROM(
+			  SELECT * FROM task_and_device  WHERE  job_id IN
+			  (	
+			  SELECT A.id FROM
+			  (
+			  SELECT id FROM wx_device_task_job WHERE user_id=79269 AND STATUS=1 ORDER BY last_updated DESC
+			  LIMIT  10  OFFSET 0
+			  ) AS A
+			  )) AS device
+			  INNER JOIN device_info AS info
+			  ON device.device_id=info.id
+			  LEFT JOIN wx_contact_info AS contact ON info.wxid=contact.id -->
+			  SELECT 
+				device.job_id AS job_id,info.id AS device_id,
+				device.status AS device_status,device.remark AS remark,device.user_id AS user_id,
+				device.last_updated AS last_updated,device.date_created AS date_created,device.id AS task_id,
+				info.device_info,info.wxid AS wx_id,info.online_time AS device_online_time,contact.wx_num,
+				contact.wx_lemon_name,contact.wx_pic
+			  FROM(
+			  SELECT * FROM task_and_device  WHERE  job_id IN
+			  <foreach item="item" index="index" collection="ids" open="("  
+		             separator="," close=")">  
+		            #{item}  
+	 		   </foreach> 
+	 		   <if test="successNum != null">
+				  AND status=1
+				</if> 
+				<!-- <if test="errorNum != null">
+				   AND status=2
+				</if> -->
+				<if test="nodoNum != null">
+				  AND status=0
+				</if>
+				<if test="failNum!= null">
+				  AND status=-1
+				</if> 
+	 		   ) AS device
+			  INNER JOIN device_info AS info
+			  ON device.device_id=info.id
+			  LEFT JOIN wx_contact_info AS contact ON info.wxid=contact.id
+   </select>
+   
+   
+   
+   <select id="selectPcFinalJobListSize" resultType="java.lang.Integer"  parameterType="java.util.Map">
+		SELECT count(id) FROM wx_device_task_job WHERE user_id=#{userId} AND STATUS=1 
+		 <if test="successNum != null">
+		  AND success_num>0
+		</if> 
+		<if test="errorNum != null">
+		  AND error_num>0
+		</if>
+		<if test="nodoNum != null">
+		  AND nodo_num>0
+		</if>
+		<if test="failNum!= null">
+		  AND fail_num>0
+		</if> 
+		<if test="allNum!= null">
+		  AND (success_num>0   or nodo_num>0 or fail_num>0)
+		</if>  
+   </select>
+   
+   
+   
+   
+   <update id="updateJobNums"  parameterType="java.lang.Long" >
+   		update wx_device_task_job set fail_num=(select count(id) from task_and_device where job_id=#{id} and status=-1),
+   			nodo_num=(select count(id) from task_and_device where job_id=#{id} and status=0),
+   			success_num=(select count(id) from task_and_device where job_id=#{id} and status=1),
+   			error_num=(select count(id) from task_and_device where job_id=#{id} and status=2),
+   			delete_num=(select count(id) from task_and_device where job_id=#{id} and status=-2)
+   			where id=#{id}
+   </update>
+   
+   
+   
+   
+   
+</mapper>
